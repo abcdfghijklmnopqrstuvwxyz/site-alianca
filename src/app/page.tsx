@@ -1,3 +1,4 @@
+import HeroBeast from '@/components/HeroBeast';
 import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import Particles from '@/components/Particles';
