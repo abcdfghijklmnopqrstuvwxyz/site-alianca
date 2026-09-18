@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CommunityType {
+  GROUP
+  CHANNEL
+}
+
+enum AuditEvent {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  PASSWORD_CHANGED
+  TWOFA_ENABLED
+  TWOFA_DISABLED
+  COMMUNITY_CREATED
+  COMMUNITY_UPDATED
+  COMMUNITY_DELETED
+  VIP_CHANGED
+  SETTINGS_UPDATED
+  UPLOAD
+  BLOCKED_ATTEMPT
+}
+
+// Dono/administrador do site. Pensado para 1 conta principal, mas suporta múltiplas.
+model Admin {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  twoFaEnabled      Boolean  @default(false)
+  twoFaSecret       String? // armazenado criptografado na aplicação, nunca em texto puro no cliente
+  recoveryCodesHash String[] @default([]) // hashes dos códigos de recuperação
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  sessions   Session[]
+  auditLogs  AuditLog[]
+}
+
+// Sessões persistidas no banco para permitir revogação/logout real (não apenas JWT stateless).
+model Session {
+  id        String   @id @default(cuid())
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+model Category {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  icon      String      @default("🔥")
+  createdAt DateTime    @default(now())
+  communities Community[]
+}
+
+model Community {
+  id          String        @id @default(cuid())
+  type        CommunityType
+  name        String
+  slug        String        @unique
+  description String        @db.Text
+  image       String?
+  link        String
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  vip         Boolean       @default(false)
+  featured    Boolean       @default(false)
+  active      Boolean       @default(true)
+  order       Int           @default(0)
+  clicks      Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([type, active])
+  @@index([slug])
+}
+
+// Configuração única (singleton, id fixo "main") controlada pelo painel /admin/configuracoes
+model Settings {
+  id             String  @id @default("main")
+  allianceName   String  @default("INFERNUM")
+  logo           String?
+  favicon        String?
+  banner         String?
+  description    String  @default("Onde as comunidades se encontram.")
+  primaryColor   String  @default("#c40000")
+  secondaryColor String  @default("#3d0000")
+  background     String?
+  particlesOn    Boolean @default(true)
+  musicUrl       String?
+  musicEnabled   Boolean @default(false)
+  musicVolume    Float   @default(0.4)
+  seoTitle       String?
+  seoDescription String?
+  seoImage       String?
+  updatedAt      DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String     @id @default(cuid())
+  event     AuditEvent
+  adminId   String?
+  admin     Admin?     @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  ip        String?
+  result    String // "success" | "failure" | descrição curta
+  metadata  Json?      // apenas dados não sensíveis (nunca senha/token/2FA/cookies)
+  createdAt DateTime   @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+}

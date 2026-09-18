@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-void text-bone-muted font-body;
+  background-image:
+    radial-gradient(ellipse 900px 600px at 50% -10%, rgba(138, 0, 0, 0.28), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 10%, rgba(138, 0, 0, 0.12), transparent 55%),
+    linear-gradient(180deg, #050303 0%, #0d0a0a 100%);
+  background-attachment: fixed;
+}
+
+.grunge-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.particles span {
+  position: absolute;
+  bottom: -10px;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(255, 59, 31, 0.75);
+  box-shadow: 0 0 6px rgba(255, 59, 31, 0.9);
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+}
+
+.text-glow {
+  text-shadow: 0 0 18px rgba(200, 20, 20, 0.6), 0 0 44px rgba(138, 0, 0, 0.35);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 14px rgba(201, 163, 90, 0.45);
+}
+
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(200, 20, 20, 0.7);
+  box-shadow: 0 0 30px rgba(200, 20, 20, 0.35);
+}
+
+.rune-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: rgba(201, 163, 90, 0.55);
+}
+.rune-divider::before,
+.rune-divider::after {
+  content: '';
+  height: 1px;
+  width: 3rem;
+  background: linear-gradient(90deg, transparent, rgba(138, 0, 0, 0.6), transparent);
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #050303; }
+::-webkit-scrollbar-thumb { background: #2b0000; border-radius: 9999px; }
