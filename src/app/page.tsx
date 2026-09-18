@@ -43,9 +43,11 @@ export default async function HomePage() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 text-center">
-        <Particles />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(138,0,0,0.3),transparent_62%)]" />
+     <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 text-center">
+      <HeroBeast />
+      <Particles />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(138,0,0,0.3),transparent_62%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent" />
 
         <div className="relative z-10 animate-fadeIn">
           <h1 className="animate-flicker font-display text-6xl font-bold uppercase tracking-wide text-bone text-glow sm:text-8xl">
