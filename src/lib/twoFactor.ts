@@ -30,14 +30,25 @@ export async function generateRecoveryCodes(count = 8) {
   for (let i = 0; i < count; i++) {
     const code = crypto.randomBytes(5).toString('hex');
     plain.push(code);
-    hashed.push(await argon2.hash(code, { type: argon2.argon2id }));
+    const salt = crypto.randomBytes(16);
+    hashed.push(
+      await argon2id({
+        password: code,
+        salt,
+        parallelism: 1,
+        iterations: 2,
+        memorySize: 19456,
+        hashLength: 32,
+        outputType: 'encoded',
+      })
+    );
   }
   return { plain, hashed };
 }
 
 export async function verifyRecoveryCode(code: string, hashes: string[]) {
   for (const hash of hashes) {
-    if (await argon2.verify(hash, code).catch(() => false)) return hash;
+    if (await argon2Verify({ password: code, hash }).catch(() => false)) return hash;
   }
   return null;
 }
