@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
-import argon2 from 'argon2';
+import { argon2id, argon2Verify } from 'hash-wasm';
+import crypto from 'node:crypto';
 import { prisma } from './db';
 import { getEnv } from './env';
 
@@ -16,17 +17,21 @@ function getSecretKey() {
 // --- Senha ---------------------------------------------------------------
 
 export async function hashPassword(password: string) {
-  return argon2.hash(password, {
-    type: argon2.argon2id,
-    memoryCost: 19456, // ~19 MB, recomendação OWASP para argon2id
-    timeCost: 2,
+  const salt = crypto.randomBytes(16);
+  return argon2id({
+    password,
+    salt,
     parallelism: 1,
+    iterations: 2,
+    memorySize: 19456, // ~19 MB, recomendação OWASP para argon2id
+    hashLength: 32,
+    outputType: 'encoded',
   });
 }
 
 export async function verifyPassword(hash: string, password: string) {
   try {
-    return await argon2.verify(hash, password);
+    return await argon2Verify({ password, hash });
   } catch {
     return false;
   }
