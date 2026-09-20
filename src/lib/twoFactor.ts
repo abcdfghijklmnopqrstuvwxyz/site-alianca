@@ -1,6 +1,6 @@
 import { authenticator } from 'otplib';
 import crypto from 'node:crypto';
-import argon2 from 'argon2';
+import { argon2id, argon2Verify } from 'hash-wasm';
 import QRCode from 'qrcode';
 
 /**
