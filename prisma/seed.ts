@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import argon2 from 'argon2';
+import { argon2id } from 'hash-wasm';
+import crypto from 'node:crypto';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,16 @@ async function main() {
     );
   }
 
-  const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
+  const salt = crypto.randomBytes(16);
+  const passwordHash = await argon2id({
+    password,
+    salt,
+    parallelism: 1,
+    iterations: 2,
+    memorySize: 19456,
+    hashLength: 32,
+    outputType: 'encoded',
+  });
 
   await prisma.admin.upsert({
     where: { email },
